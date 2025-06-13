@@ -32,14 +32,16 @@ void Node::Unsubscribe(Node* target)
     auto it = subscriptions_.find(target);
     if (it != subscriptions_.end()) {
         subscriptions_.erase(it);
-        target->subscriptions_.erase(this);
+        target->subscribers_.erase(this);
     }
 }
 
-void Node::UpdateNeighborsCache()
+void Node::UpdateCache()
 {
     cached_neighbors_.clear();
-    cached_neighbors_.insert(subscribers_.begin(), subscribers_.end());
+    cached_subscribers_.clear();
+    cached_subscribers_ = subscribers_;
+    cached_neighbors_ = subscribers_;
     for (const auto& pair : subscriptions_)
         cached_neighbors_.insert(pair.first);
 }
@@ -84,15 +86,18 @@ Node* Node::FindSubscriptionTarget() const
 
 Node* Node::FindUnsubscriptionTarget() const
 {
+    if (subscriptions_.empty()) return nullptr;
+    
     static thread_local std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<size_t> dist(0, cached_neighbors_.size() - 1);
-    auto it = cached_neighbors_.begin();
+    std::uniform_int_distribution<size_t> dist(0, subscriptions_.size() - 1);
+    auto it = subscriptions_.begin();
     std::advance(it, dist(rng));
-    return *it;
+    return it->first;
 }
 
 void Node::DoSubscribe()
 {
+    // std::cout << "Do subscribe\n";
     Node* SubscriptionTarget = FindSubscriptionTarget();
     if (SubscriptionTarget)
         Subscribe(SubscriptionTarget, network_->GetHandlerFactory().CreateRandomHandler());
@@ -100,6 +105,7 @@ void Node::DoSubscribe()
 
 void Node::DoUnsubscribe()
 {
+    // std::cout << "Do unsubscribe\n";
     Node* UsubscriptionTarget = FindUnsubscriptionTarget();
     if (UsubscriptionTarget)
         Unsubscribe(UsubscriptionTarget);
@@ -107,22 +113,24 @@ void Node::DoUnsubscribe()
 
 void Node::DoSendEvent()
 {
+    // std::cout << "Do event\n";
     Event event;
     event.sender = this;
     static thread_local std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> dist(0, 10);
     event.value = dist(rng);
-    for (const auto subscriber : subscribers_) {
+    for (const auto subscriber : cached_subscribers_) {
         subscriber->HandleEvent(event);
     }
 }
 
 void Node::DoCreateNode()
 {
+    // std::cout << "Do create\n";
     if (!network_) return;
-    
+
     Node* newNode = network_->AddNode();
-    
+
     if (newNode) {
         Subscribe(newNode, network_->GetHandlerFactory().CreateRandomHandler());
     }

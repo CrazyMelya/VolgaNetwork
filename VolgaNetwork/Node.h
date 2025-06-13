@@ -20,7 +20,7 @@ public:
     std::string GetName() const { return name_; }
     void Subscribe(Node* target, std::unique_ptr<IEventHandler> handler);
     void Unsubscribe(Node* target);
-    void UpdateNeighborsCache();
+    void UpdateCache();
     void HandleEvent(Event event);
 
     void DoSubscribe();
@@ -28,12 +28,18 @@ public:
     void DoSendEvent();
     void DoCreateNode();
 
+    bool HasSubscriptions() const { return !subscriptions_.empty(); }
+    bool HasSubscribers() const { return !subscribers_.empty(); }
+
 private:
     std::string name_;
     std::unordered_map<Node*, std::unique_ptr<IEventHandler>> subscriptions_;
     std::unordered_set<Node*> subscribers_;
     std::unordered_map<Node*, std::vector<int>> received_data_;
+    
     std::unordered_set<Node*> cached_neighbors_;
+    std::unordered_set<Node*> cached_subscribers_;
+    
     Network* network_ = nullptr;
 
     Node* FindSubscriptionTarget() const;
