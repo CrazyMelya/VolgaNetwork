@@ -3,8 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-
-class IEventHandler;
+#include "EventHandlers/IEventHandler.h"
 
 using namespace std;
 
@@ -29,12 +28,14 @@ public:
     string GetName() const { return name_; }
     void Subscribe(Node* target, unique_ptr<IEventHandler> handler);
     void Unsubscribe(Node* target);
+    void UpdateNeighborsCache();
 
 private:
     string name_;
     unordered_map<Node*, unique_ptr<IEventHandler>> subscriptions_;
     unordered_set<Node*> subscribers_;
     unordered_map<Node*, std::vector<int>> received_data_;
+    unordered_set<Node*> cached_neighbors_;
 
     Node* FindSubscriptionTarget() const;
 };

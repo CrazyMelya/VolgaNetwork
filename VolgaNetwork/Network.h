@@ -2,16 +2,16 @@
 #include <memory>
 #include <random>
 #include <vector>
+#include"Node.h"
 
 using namespace std;
-
-class Node;
 
 class Network
 {
     vector<unique_ptr<Node>> nodes_;
-    mt19937 rng_{static_cast<unsigned>(std::time(nullptr))};
+    mt19937 rng_;
     std::uniform_real_distribution<> dist_;
+    int step_ = 0;
 
 public:
     Network();

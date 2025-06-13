@@ -7,13 +7,11 @@
 #include "EventHandlers/CountHandler.h"
 #include "EventHandlers/SumHandler.h"
 
-Network::Network() : dist_(0.0, 1.0) {
-    // Создаём 5 узлов
+Network::Network() : rng_(random_device()()), dist_(0.0, 1.0) {
     for (int i = 0; i < 5; ++i) {
         nodes_.push_back(std::make_unique<Node>("Node_" + std::to_string(i)));
     }
-
-    // Устанавливаем случайные подписки
+    
     for (auto& node : nodes_) {
         for (auto& other : nodes_) {
             if (node.get() != other.get() && dist_(rng_) < 0.4) {
@@ -28,27 +26,15 @@ Network::Network() : dist_(0.0, 1.0) {
 }
 
 void Network::step() {
-    // Генерация событий с вероятностью 40%
-    for (auto& node : nodes_) {
-        if (dist_(rng_) < 0.4) {
-            int value = rng_() % 100;
-            for (Node* subscriber : node->subscribers) {
-                subscriber->receiveEvent(node.get(), value);
-            }
-        }
+    for (auto& node : nodes_)
+    {
+        cout << step_ << " " << node->GetName() << '\n';
     }
-
-    // Обработка событий
-    for (auto& node : nodes_) {
-        node->handleEvents();
-    }
-
-    // TODO: можно добавить удаление изолированных узлов
+    step_++;
 }
 
 void Network::run(int steps) {
     for (int i = 0; i < steps; ++i) {
-        cout << "\n=== Step " << i + 1 << " ===\n";
         step();
     }
 }

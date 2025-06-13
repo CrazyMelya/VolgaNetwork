@@ -1,5 +1,7 @@
 ﻿#include "Node.h"
 
+#include <algorithm>
+#include <random>
 #include <utility>
 
 Node::Node(std::string name) : name_(std::move(name)) {}
@@ -31,45 +33,34 @@ void Node::Unsubscribe(Node* target)
     }
 }
 
-Node* Node::FindSubscriptionTarget() const {
-    std::unordered_set<Node*> neighbors;
+void Node::UpdateNeighborsCache()
+{
+    cached_neighbors_.clear();
+    cached_neighbors_.insert(subscribers_.begin(), subscribers_.end());
+    for (const auto& pair : subscriptions_)
+        cached_neighbors_.insert(pair.first);
+}
 
-    // Соседи: те, кто подписан на меня
-    for (Node* sub : subscribers_) {
-        neighbors.insert(sub);
-    }
-
-    // Соседи: те, на кого я подписан
-    for (const auto& pair : subscriptions_) {
-        neighbors.insert(pair.first);
-    }
-
-    // Кандидаты: соседи соседей, исключая себя и уже подписанных
-    std::unordered_set<Node*> candidates;
-
-    for (Node* neighbor : neighbors) {
-        // Те, кто подписан на соседа
-        for (Node* n_sub : neighbor->subscribers_) {
-            if (n_sub != this && subscriptions_.find(n_sub) == subscriptions_.end()) {
-                candidates.insert(n_sub);
-            }
-        }
-
-        // Те, на кого подписан сосед
-        for (const auto& pair : neighbor->subscriptions_) {
-            Node* n_target = pair.first;
-            if (n_target != this && subscriptions_.find(n_target) == subscriptions_.end()) {
-                candidates.insert(n_target);
+Node* Node::FindSubscriptionTarget() const
+{
+    unordered_set<Node*> candidates;
+    for (const Node* firstNeighbor : cached_neighbors_) {
+        for (Node* secondNeighbor : firstNeighbor->cached_neighbors_) {
+            if (secondNeighbor != this && subscriptions_.find(secondNeighbor) == subscriptions_.end()) {
+                candidates.insert(secondNeighbor);
             }
         }
     }
 
-    // Выбираем случайного кандидата, если есть
-    if (!candidates.empty()) {
+    if (!candidates.empty())
+    {
+        static thread_local mt19937 rng(random_device{}());
+        std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
+    
         auto it = candidates.begin();
-        std::advance(it, rand() % candidates.size());
+        std::advance(it, dist(rng));
         return *it;
     }
-
+    
     return nullptr;
 }

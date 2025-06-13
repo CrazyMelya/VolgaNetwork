@@ -1,8 +1,11 @@
 
 #include <iostream>
 
+#include "Network.h"
+
 int main(int argc, char* argv[])
 {
-    std::cout << "Hello World!\n";
+    Network net;
+    net.run(5);
     return 0;
 }
