@@ -1,8 +1,9 @@
 ﻿#include "Network.h"
 
-#include <iostream>
+#if _WIN32 || _WIN64
+#include <conio.h>
+#endif 
 #include <string>
-
 #include "Node.h"
 #include "EventHandlers/CountHandler.h"
 #include "EventHandlers/SumHandler.h"
@@ -28,6 +29,10 @@ void Network::Run()
 {
     while (!nodes_.empty()){
         Tick();
+#if _WIN32 || _WIN64
+        if (_kbhit())
+            break;
+#endif
     }
 }
 
