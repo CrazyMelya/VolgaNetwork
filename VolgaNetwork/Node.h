@@ -5,15 +5,7 @@
 #include <unordered_set>
 #include "EventHandlers/IEventHandler.h"
 
-using namespace std;
-
-struct Probabilities {
-    double createEvent = 0.2;
-    double subscribe = 0.2;
-    double unsubscribe = 0.2;
-    double spawnNode = 0.2;
-    double doNothing = 0.2;
-};
+class Network;
 
 struct Event {
     class Node* sender;
@@ -23,19 +15,27 @@ struct Event {
 class Node
 {
 public:
-    explicit Node(std::string name);
-    const vector<int>* GetData(const Node* sender) const;
-    string GetName() const { return name_; }
-    void Subscribe(Node* target, unique_ptr<IEventHandler> handler);
+    explicit Node(std::string name, Network* network);
+    const std::vector<int>* GetData(const Node* sender) const;
+    std::string GetName() const { return name_; }
+    void Subscribe(Node* target, std::unique_ptr<IEventHandler> handler);
     void Unsubscribe(Node* target);
     void UpdateNeighborsCache();
+    void HandleEvent(Event event);
+
+    void DoSubscribe();
+    void DoUnsubscribe();
+    void DoSendEvent();
+    void DoCreateNode();
 
 private:
-    string name_;
-    unordered_map<Node*, unique_ptr<IEventHandler>> subscriptions_;
-    unordered_set<Node*> subscribers_;
-    unordered_map<Node*, std::vector<int>> received_data_;
-    unordered_set<Node*> cached_neighbors_;
+    std::string name_;
+    std::unordered_map<Node*, std::unique_ptr<IEventHandler>> subscriptions_;
+    std::unordered_set<Node*> subscribers_;
+    std::unordered_map<Node*, std::vector<int>> received_data_;
+    std::unordered_set<Node*> cached_neighbors_;
+    Network* network_ = nullptr;
 
     Node* FindSubscriptionTarget() const;
+    Node* FindUnsubscriptionTarget() const;
 };

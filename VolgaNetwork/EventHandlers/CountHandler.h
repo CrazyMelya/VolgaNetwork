@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include "IEventHandler.h"
 
-using namespace std;
-
 class CountHandler : public IEventHandler
 {
 public:
