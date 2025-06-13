@@ -29,7 +29,7 @@ void Node::Unsubscribe(Node* target)
 {
     if (!target || target == this) return;
 
-    auto it = subscriptions_.find(target);
+    const auto it = subscriptions_.find(target);
     if (it != subscriptions_.end()) {
         subscriptions_.erase(it);
         target->subscribers_.erase(this);

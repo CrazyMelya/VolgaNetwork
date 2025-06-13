@@ -1,8 +1,8 @@
 ﻿#include "EventHandlerFactory.h"
 
-void EventHandlerFactory::RegisterHandler(const std::string& name, CreateHandlerFn factoryFn)
+void EventHandlerFactory::RegisterHandler(const std::string& Name, CreateHandlerFn FactoryFn)
 {
-    registry_[name] = std::move(factoryFn);
+    registry_[Name] = std::move(FactoryFn);
 }
 
 std::unique_ptr<IEventHandler> EventHandlerFactory::CreateRandomHandler()
@@ -11,7 +11,7 @@ std::unique_ptr<IEventHandler> EventHandlerFactory::CreateRandomHandler()
     if (registry_.empty())
         return nullptr;
 
-    size_t index = dist(rng_);
+    const size_t index = dist(rng_);
     auto it = registry_.begin();
     std::advance(it, index);
     return it->second();

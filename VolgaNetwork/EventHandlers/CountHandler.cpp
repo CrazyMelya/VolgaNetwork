@@ -4,10 +4,10 @@
 #include <vector>
 #include "../Node.h"
 
-void CountHandler::HandleEvent(Node* sender, Node* receiver)
+void CountHandler::HandleEvent(Node* Sender, Node* Receiver)
 {
-    const std::vector<int>* data = receiver->GetData(sender);
-    if (data) {
-        std::cout << sender->GetName() << " -> " << receiver->GetName() << ": N = " << data->size() << '\n';
+    const std::vector<int>* Data = Receiver->GetData(Sender);
+    if (Data) {
+        std::cout << Sender->GetName() << " -> " << Receiver->GetName() << ": N = " << Data->size() << '\n';
     }
 }

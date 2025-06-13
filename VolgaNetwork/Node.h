@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include "EventHandlers/IEventHandler.h"
 
+
 class Network;
 
 struct Event {
@@ -36,10 +37,10 @@ private:
     std::unordered_map<Node*, std::unique_ptr<IEventHandler>> subscriptions_;
     std::unordered_set<Node*> subscribers_;
     std::unordered_map<Node*, std::vector<int>> received_data_;
-    
+
     std::unordered_set<Node*> cached_neighbors_;
     std::unordered_set<Node*> cached_subscribers_;
-    
+
     Network* network_ = nullptr;
 
     Node* FindSubscriptionTarget() const;

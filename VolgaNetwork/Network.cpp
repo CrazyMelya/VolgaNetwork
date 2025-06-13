@@ -13,9 +13,9 @@ Network::Network()
     handlerFactory_.RegisterHandler("Sum", [] { return std::make_unique<SumHandler>(); });
 }
 
-void Network::tick()
+void Network::Tick()
 {
-    for (auto& node : nodes_) {
+    for (const auto& node : nodes_) {
         node->UpdateCache();
     }
     for (auto& node : nodes_) {
@@ -24,10 +24,10 @@ void Network::tick()
     UpdateNodes();
 }
 
-void Network::run()
+void Network::Run()
 {
     while (!nodes_.empty()){
-        tick();
+        Tick();
     }
 }
 

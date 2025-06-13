@@ -5,14 +5,6 @@
 #include"Node.h"
 #include "EventHandlers/EventHandlerFactory.h"
 
-enum class NodeAction {
-    Subscribe,
-    Unsubscribe,
-    CreateNode,
-    CreateEvent,
-    DoNothing
-};
-
 class Network
 {
     std::vector<std::unique_ptr<Node>> nodes_;
@@ -22,18 +14,18 @@ class Network
     std::vector<double> action_weights_;
     std::discrete_distribution<size_t> action_distribution_;
     EventHandlerFactory handlerFactory_;
-    size_t current_node_num_ = 0;;
+    size_t current_node_num_ = 0;
 
 public:
     Network();
 
     EventHandlerFactory& GetHandlerFactory() { return handlerFactory_; }
-    void run();
+    void Run();
     Node* AddNode();
     void Init(size_t initial_node_count, double initial_subscription_probability, std::vector<double> action_weights = {0.2, 0.2, 0.2, 0.2, 0.2});
 
 private:
-    void tick();
+    void Tick();
     void PerformAction(Node* node);
     void UpdateNodes();
 };

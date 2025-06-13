@@ -5,9 +5,7 @@
 #include <functional>
 #include <memory>
 #include <random>
-
 #include "IEventHandler.h"
-
 
 class EventHandlerFactory
 {
@@ -17,7 +15,7 @@ class EventHandlerFactory
     std::mt19937 rng_{std::random_device{}()};
 
 public:
-    void RegisterHandler(const std::string& name, CreateHandlerFn factoryFn);
+    void RegisterHandler(const std::string& Name, CreateHandlerFn FactoryFn);
 
     std::unique_ptr<IEventHandler> CreateRandomHandler();
 };
